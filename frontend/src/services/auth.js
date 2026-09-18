@@ -1,7 +1,7 @@
 import { api } from "./api";
 
 // Servicio de autenticación: conecta el frontend con la API de práctica.
-const AUTH_BASE_URL = "https://deploy-example-js.vercel.app/";
+const AUTH_BASE_URL = "https://deploy-example-js.vercel.app";
 
 async function authRequest(path, body) {
   const response = await fetch(`${AUTH_BASE_URL}${path}`, {
