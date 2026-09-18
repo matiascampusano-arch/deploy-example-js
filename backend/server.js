@@ -12,6 +12,7 @@ const express = require("express");
 const cors = require("cors");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const rateLimit = require("express-rate-limit");
 
 const PORT = process.env.PORT || 3000;
 const FRONTEND_ORIGIN = process.env.FRONTEND_ORIGIN || "http://localhost:5173";
@@ -20,7 +21,16 @@ const JWT_SECRET =
   process.env.JWT_SECRET || "clave-de-practica-no-usar-en-produccion";
 
 const app = express();
+
+app.set("trust proxy", 1);
+
 app.use(express.json());
+// Limitar la cantidad de peticiones para prevenir ataques de fuerza bruta
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutos
+  max: 100, // límite de 100 peticiones por IP
+});
+app.use(limiter);
 
 // --- CORS ---------------------------------------------------------------
 // Igual que en el webinar: el servidor declara explícitamente en qué origen confía.
@@ -63,7 +73,7 @@ function authMiddleware(req, res, next) {
 }
 
 // --- 1) Registro ----------------------------------------------------------
-app.post("/signup", async (req, res) => {
+app.post("/signup", limiter, async (req, res) => {
   const { email, password } = req.body || {};
 
   if (!email || !password) {
@@ -71,6 +81,17 @@ app.post("/signup", async (req, res) => {
       .status(400)
       .json({ message: "email y password son obligatorios." });
   }
+
+  if (
+    password.length < 8 &&
+    /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/.test(password) === false
+  ) {
+    return res.status(400).json({
+      message:
+        "La contraseña debe tener al menos 8 caracteres, incluyendo al menos una letra y un número.",
+    });
+  }
+
   if (findUserByEmail(email)) {
     return res
       .status(409)
@@ -130,6 +151,10 @@ app.get("/", (_req, res) => {
     ok: true,
     message: "API de autenticación de práctica — Sprint 15",
   });
+});
+
+app.get("/health", (_req, res) => {
+  res.status(200).json({ success: true, data: { status: "ok" }, error: null });
 });
 
 app.listen(PORT, () => {
