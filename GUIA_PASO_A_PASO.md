@@ -2,6 +2,8 @@
 
 Webinar 1, Sprint 15. Duración estimada: 20 minutos.
 
+Edicion
+
 Antes de comenzar, iniciá el backend (`cd backend && npm start`) y el frontend (`cd frontend && npm run dev`). Abrí `http://localhost:5173/registro`.
 
 La actividad usa JavaScript y JSX. El foco es seguir los datos entre la API, el contexto y los componentes. Podés ejecutar `npm run build` al terminar para comprobar que Vite puede empaquetar la aplicación.
