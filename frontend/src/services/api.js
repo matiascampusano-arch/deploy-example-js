@@ -23,6 +23,6 @@ class Api {
   }
 }
 
-export const api = new Api("http://localhost:3000", {
+export const api = new Api("https://deploy-example-js.vercel.app/", {
   "Content-Type": "application/json",
 });
